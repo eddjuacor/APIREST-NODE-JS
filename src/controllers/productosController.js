@@ -1,57 +1,71 @@
-import Producto from '../models/productosModel.js'
+import sequelize from '../config/db.js'
 
-export async function getProductos(req, res) {
+ export async function insertarProductos(req, res) {
     try {
-        const productos = await Producto.findAll();
-        res.json(productos);
+        const sp_InsertarProductos = 'sp_InsertarProductos'; // Nombre del procedimiento almacenado
+        
+        const parametros = {
+          replacements: {
+            "idCategoriaProductos": 1,
+            "idUsuarios": 1,
+            "nombre": "Drone Mavic Air 10",
+            "marca":"DJI",
+            "codgo": "MAVICAIR10",
+            "stock": 330,
+            "idEstados": 1,
+            "precio": 4566
+          },
+          type: sequelize.QueryTypes.SELECT,
+        };
+    
+        const resultado = await sequelize.query(`EXEC ${sp_InsertarProductos} :idCategoriaProductos, :idUsuarios, :nombre, :marca, :codgo, :stock, :idEstados, :precio `, parametros);
+    
+        res.json(resultado); // el resultado se envia en json
       } catch (error) {
-        console.error('Error al obtener estados:', error);
+        console.error('Error ejecutando el procedimiento almacenado:', error);
+        res.status(500).json({ error: 'Ocurrió un error al ejecutar el procedimiento almacenado' });
       }
   }
-
-
-export async function insertarProductos( req, res) {
-    const {
-        idProductos, idCategoriaProductos,idUsuarios, nombre, 
-        marca, codigo, stock, idEstados, precio, fecha_creacion
-        } = req.body
+  
+  //procedimiento almacenado para actualizar
+  export async function actualizarProductos(req, res) {
     try {
-        // Crear un nuevo registro en la base de datos
-        const nuevoProducto = await Producto.create({
-             idProductos, idCategoriaProductos,idUsuarios, nombre, 
-             marca, codigo, stock, idEstados, precio, fecha_creacion   
-            });
-        res.status(201).json(nuevoProducto);
+        const idProductos = req.params.id;
+        const { idUsuarios, idCategoriaProductos, nombre, marca, codigo, stock, idEstados, precio } = req.body;
+    
+        // Aqui armamos la consulta para el procedimiento almacenado
+        const sqlQuery = `
+          EXEC [sp_UpdateProductos] 
+            @idProductos = :idProductos,
+            @idCategoriaProductos = :idCategoriaProductos,
+            @idUsuarios = :idUsuarios,
+            @nombre = :nombre,
+            @marca = :marca,
+            @codigo = :codigo,
+            @stock = :stock,
+            @idEstados = :idEstados,
+            @precio = :precio
+
+        `;
+    
+        // Aqui ejecturo el procedimiento almacenado
+        await sequelize.query(sqlQuery, {
+          replacements: {
+            idProductos: idProductos,
+            idCategoriaProductos: idCategoriaProductos,
+            idUsuarios: idUsuarios,
+            nombre: nombre,
+            marca: marca,
+            codigo: codigo,
+            stock: stock,
+            idEstados: idEstados,
+            precio: precio
+          }
+        });
+    
+        res.json({ mensaje: 'Producto actualizad0 correctamente' });
       } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error('Error actualizando el producto:', error);
+        res.status(500).json({ error: ' error al actualizar el produccto' });
       }
   }
-
-export async function actualizarProductos(req, res){
-  const idProductos = parseInt(req.params.id, 10);
-  const {
-    idCategoriaProductos,idUsuarios, nombre, 
-    marca, codigo, stock, idEstados, precio, fecha_creacion
-   } = req.body;
-
-  try {
-    // Actualizar el registro en la base de datos
-    const [affectedRows] = await Producto.update(
-      { 
-        idCategoriaProductos,idUsuarios, nombre, 
-         marca, codigo, stock, idEstados, precio, fecha_creacion
-      },
-      { where: { idProductos: idProductos } }
-    );
-
-    if (affectedRows > 0) {
-      // Obtener el usuario actualizado
-      const updatedProductos = await Producto.findByPk(idProductos);
-      res.json(updatedProductos);
-    } else {
-      res.status(404).json({ message: 'Producto no encontrado' });
-    }
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};

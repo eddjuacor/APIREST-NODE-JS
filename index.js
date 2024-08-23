@@ -1,8 +1,9 @@
 import express from 'express'
 import db from './src/config/db.js'
 import bodyParser from 'body-parser'
-import usuariosRoutes from './src/routes/usuariosRoutes.js'
 import productosRoutes from './src/routes/productosRoutes.js'
+import categoriaProductosRoutes from './src/routes/categoriaProductosRoutes.js'
+import estadoRoutes from './src/routes/estadosRoutes.js'
 const app = express()
 
 //conexion base de datos
@@ -16,8 +17,9 @@ try {
 app.use(bodyParser.json());
 
 //alta a las rutas
-app.use(usuariosRoutes)
 app.use(productosRoutes)
+app.use(categoriaProductosRoutes)
+app.use(estadoRoutes)
 
 
 //sevidor
