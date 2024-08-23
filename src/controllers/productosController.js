@@ -4,21 +4,23 @@ import sequelize from '../config/db.js'
     try {
         const sp_InsertarProductos = 'sp_InsertarProductos'; // Nombre del procedimiento almacenado
         
+        const {idCategoriaProductos, idUsuarios,nombre, marca, codigo, stock, idEstados, precio } = req.body;
+
         const parametros = {
           replacements: {
-            "idCategoriaProductos": 1,
-            "idUsuarios": 1,
-            "nombre": "Drone Mavic Air 10",
-            "marca":"DJI",
-            "codgo": "MAVICAIR10",
-            "stock": 330,
-            "idEstados": 1,
-            "precio": 4566
+            idCategoriaProductos,
+            idUsuarios,
+            nombre,
+            marca,
+            codigo,
+            stock,
+            idEstados,
+            precio
           },
           type: sequelize.QueryTypes.SELECT,
         };
     
-        const resultado = await sequelize.query(`EXEC ${sp_InsertarProductos} :idCategoriaProductos, :idUsuarios, :nombre, :marca, :codgo, :stock, :idEstados, :precio `, parametros);
+        const resultado = await sequelize.query(`EXEC ${sp_InsertarProductos} :idCategoriaProductos, :idUsuarios, :nombre, :marca, :codigo, :stock, :idEstados, :precio `, parametros);
     
         res.json(resultado); // el resultado se envia en json
       } catch (error) {

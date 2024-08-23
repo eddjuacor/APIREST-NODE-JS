@@ -4,11 +4,13 @@ import sequelize from '../config/db.js'
     try {
         const sp_InsertarCategoriaProductos = 'sp_InsertarCategoriaProductos'; // Nombre del procedimiento almacenado
         
+        const{idUsuarios, nombre, idEstado} = req.body;
+
         const parametros = {
           replacements: {
-            idUsuarios: 1,
-            nombre: "Electricidad",
-            idEstado: 1
+            idUsuarios,
+            nombre,
+            idEstado
           },
           type: sequelize.QueryTypes.SELECT,
         };

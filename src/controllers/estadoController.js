@@ -4,9 +4,11 @@ import sequelize from '../config/db.js'
     try {
         const sp_Estados = 'sp_Estados'; // Nombre del procedimiento almacenado
         
+        const {nombre} = req.body;
+
         const parametros = {
           replacements: {
-            nombre:"Activo1"
+            nombre
           },
           type: sequelize.QueryTypes.SELECT,
         };
