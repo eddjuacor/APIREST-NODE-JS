@@ -33,8 +33,6 @@ import sequelize from '../config/db.js'
           EXEC [sp_UpdateEstados] 
             @idEstados = :idEstados,
             @nombre = :nombre
-            
-
         `;
     
         // Aqui ejecturo el procedimiento almacenado

@@ -44,6 +44,9 @@ import bcrypt from 'bcrypt'
     try {
         const idUsuarios = req.params.id;
         const { idEstados, idRol, correo_electronico, nombre_completo, password, telefono, fecha_nacimiento  } = req.body;
+
+        const saltRounds = 10;
+        const hashedPassword = await bcrypt.hash(password, saltRounds)
     
         // Aqui armamos la consulta para el procedimiento almacenado
         const sqlQuery = `
@@ -67,7 +70,7 @@ import bcrypt from 'bcrypt'
             idRol: idRol,
             correo_electronico: correo_electronico,
             nombre_completo: nombre_completo,
-            password: password,
+            password: hashedPassword,
             telefono: telefono,
             fecha_nacimiento: fecha_nacimiento
 

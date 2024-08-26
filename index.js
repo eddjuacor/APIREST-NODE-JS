@@ -5,6 +5,9 @@ import productosRoutes from './src/routes/productosRoutes.js'
 import categoriaProductosRoutes from './src/routes/categoriaProductosRoutes.js'
 import estadoRoutes from './src/routes/estadosRoutes.js'
 import usuariosRoutes from './src/routes/usuariosRoutes.js'
+import ordenDetalleRoutes from './src/routes/ordenDetalleRoutes.js'
+
+
 const app = express()
 
 //conexion base de datos
@@ -22,6 +25,9 @@ app.use(productosRoutes)
 app.use(categoriaProductosRoutes)
 app.use(estadoRoutes)
 app.use(usuariosRoutes)
+app.use(ordenDetalleRoutes)
+
+
 
 
 //sevidor
