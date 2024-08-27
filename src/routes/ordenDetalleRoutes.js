@@ -1,11 +1,11 @@
 import {Router} from 'express'
-import { insertarOrdenDetalles, actualizarOrdenDetalles } from '../controllers/ordenDetallesController.js';
+import { insertarOrdenDetalles, actualizarOrdenDetalle } from '../controllers/ordenDetallesController.js';
 
 const router = Router();
 
 
 router.post('/ordenDetalles', insertarOrdenDetalles)
 
-router.put('/ordenDetalles/:id', actualizarOrdenDetalles)
+router.post('ordenDetalles/:id', actualizarOrdenDetalle)
 
 export default router;
