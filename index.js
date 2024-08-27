@@ -6,7 +6,7 @@ import categoriaProductosRoutes from './src/routes/categoriaProductosRoutes.js'
 import estadoRoutes from './src/routes/estadosRoutes.js'
 import usuariosRoutes from './src/routes/usuariosRoutes.js'
 import ordenDetalleRoutes from './src/routes/ordenDetalleRoutes.js'
-
+import auth from './src/routes/auth.js'
 
 const app = express()
 
@@ -26,6 +26,7 @@ app.use(categoriaProductosRoutes)
 app.use(estadoRoutes)
 app.use(usuariosRoutes)
 app.use(ordenDetalleRoutes)
+app.use(auth)
 
 
 
