@@ -47,30 +47,20 @@ import sequelize from '../config/db.js'
 export async function actualizarOrdenDetalle(){
 
   try{ 
-    const UpdateDetalleOrden = 'UpdateDetalleOrden'; // Nombre del procedimiento almacenado
+    const sp_UpdateDetalleOrden = 'sp_UpdateDetalleOrden'; // Nombre del procedimiento almacenado
     
-  const  idOrden  = req.headers['idOrden'].id;
+    const  idOrden  = req.headers['idorden'];
 
     const idUsuarios = req.headers['idusuarios'];
     const idEstados = req.headers['idestados'];
 
-    if (!idOrden) {
-      console.error('Missing order ID');
-      return res.status(400).json({ error: 'Missing order ID' });
-  }
-
-  if (!idUsuarios || !idEstados) {
-    console.error('Missing required fields in headers');
-    return res.status(400).json({ error: 'Missing required fields in headers' });
-}
-
-await sequelize.query(
-  `EXEC ${UpdateDetalleOrden} :idOrden, :idUsuarios, :idEstados`,
+   await sequelize.query(
+  `EXEC ${sp_UpdateDetalleOrden} :idOrden, :idUsuarios, :idEstados`,
   {
       replacements: {
-          idOrden: parseInt(idOrden, 10),
-          idUsuarios: parseInt(idUsuarios, 10),
-          idEstados: parseInt(idEstados, 10)
+          idOrden:idOrden,
+          idUsuarios:idUsuarios,
+          idEstados:idEstados,
       },
       type: sequelize.QueryTypes.SELECT
   }
