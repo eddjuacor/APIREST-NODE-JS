@@ -1,59 +1,74 @@
-import sequelize from '../config/db.js'
+import sequelize from "../config/db.js";
 
- export async function insertarCategoriaProductos(req, res) {
-    try {
-        const sp_InsertarCategoriaProductos = 'sp_InsertarCategoriaProductos'; // Nombre del procedimiento almacenado
-        
-        const{idUsuarios, nombre, idEstado} = req.body;
 
-        const parametros = {
-          replacements: {
-            idUsuarios,
-            nombre,
-            idEstado
-          },
-          type: sequelize.QueryTypes.SELECT,
-        };
-    
-        const resultado = await sequelize.query(`EXEC ${sp_InsertarCategoriaProductos} :idUsuarios, :nombre, :idEstado`, parametros);
-    
-        res.json(resultado); // el resultado se envia en json
-      } catch (error) {
-        console.error('Error ejecutando el procedimiento almacenado:', error);
-        res.status(500).json({ error: 'Ocurrió un error al ejecutar el procedimiento almacenado' });
-      }
+//funcion para ejecutar el procedimiento almacenado para insertar productos
+export async function insertarCategoriaProductos(req, res) {
+  try {
+    //nombre del procedimiento almacenado
+    const sp_InsertarCategoriaProductos = "sp_InsertarCategoriaProductos"; // Nombre del procedimiento almacenado
+
+    //informacion que el cliente nos envia desde el frontend
+    const { idUsuarios, nombre, idEstados } = req.body;
+
+    //esto nos facilita la interaccion con la base de datos
+    const parametros = {
+      replacements: {
+        idUsuarios,
+        nombre,
+        idEstados,
+      },
+      type: sequelize.QueryTypes.SELECT,
+    };
+
+    //Ejecutamos el procedimiento almacenado con los campos con los que vamos a interactuar
+       await sequelize.query(
+      `EXEC ${sp_InsertarCategoriaProductos} :idUsuarios, :nombre, :idEstados`,
+      parametros
+    );
+
+   
+    res.status(200).json({ message: 'Categoria ingresada correctamente' }); 
+  } catch (error) {
+    console.error("Error ejecutando el procedimiento almacenado:", error);
+    res.status(500).json({
+        error: "Ocurrió un error al ejecutar el procedimiento almacenado",
+      });
   }
-  
-  //procedimiento almacenado para actualizar
-  export async function actualizarCategoriaProductos(req, res) {
-    try {
-        const idCategoriaProductos = req.params.id;
-        const { idUsuarios, nombre, idEstados } = req.body;
-    
-        // Aqui armamos la consulta para el procedimiento almacenado
-        const sqlQuery = `
+}
+
+/*----------------procedimiento almacenado para actualizar--------------------------------*/
+
+//Ejecutamos el procedimiento almacenado para actualizar un producto
+export async function actualizarCategoriaProductos(req, res) {
+  try {
+
+    //recibimos del cliente el id del producto que vamos a actualizar
+    const idCategoriaProductos = req.params.id;
+
+    //informacion que el cliente nos envia desde el frontend
+    const { idUsuarios, nombre, idEstados } = req.body;
+
+    // Aqui armamos la consulta para el procedimiento almacenado
+    const sqlQuery = `
           EXEC sp_UpdateCategoriaProductos 
             @idCategoriaProductos = :idCategoriaProductos,
             @idUsuarios = :idUsuarios,
             @nombre = :nombre,
             @idEstados = :idEstados
         `;
-    
-        // Aqui ejecturo el procedimiento almacenado
-        await sequelize.query(sqlQuery, {
-          replacements: {
-            idCategoriaProductos: idCategoriaProductos,
-            idUsuarios: idUsuarios,
-            nombre: nombre,
-            idEstados: idEstados
-          }
-        });
-    
-        res.json({ mensaje: 'Categoria actualizada correctamente' });
-      } catch (error) {
-        console.error('Error actualizando la categoria:', error);
-        res.status(500).json({ error: ' error al actualizar la categoria' });
-      }
-  }
 
-  
+    // aqui sustituimos los marcadores de posicion en la consulta sql
+    await sequelize.query(sqlQuery, {
+      replacements: {
+        idCategoriaProductos: idCategoriaProductos,
+        idUsuarios: idUsuarios,
+        nombre: nombre,
+        idEstados: idEstados,
+      },
+    });
+
+    res.status(200).json({ message: 'Cateogira actualizada correctamente' }); 
+  } catch (error) {
+    res.status(500).json({ error: " error al actualizar la categoria" });
+  }
+}

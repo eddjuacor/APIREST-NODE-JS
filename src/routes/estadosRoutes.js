@@ -1,6 +1,6 @@
 import {Router} from 'express'
 import { insertarEstado, actualizarEstado } from '../controllers/estadoController.js';
-import authenticateToken from './authToken.js'
+import {authenticateToken} from '../controllers/authTokenController.js'
 
 
 

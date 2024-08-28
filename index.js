@@ -6,12 +6,17 @@ import categoriaProductosRoutes from './src/routes/categoriaProductosRoutes.js'
 import estadoRoutes from './src/routes/estadosRoutes.js'
 import usuariosRoutes from './src/routes/usuariosRoutes.js'
 import ordenDetalleRoutes from './src/routes/ordenDetalleRoutes.js'
-import authToken from './src/routes/authToken.js'
+import authTokenRoutes from './src/routes/authTokenRoutes.js'
+import ordenDetalleFinal from './src/routes/ordenDetalleFinal.js'
 
+//inicializamos express
 const app = express()
-app.use(express.json()) 
-app.use(express.urlencoded({extended: false}))
 
+//configuaamos el middleware para analizar las solicitudes http
+app.use(express.json()) 
+
+// para analizar el cuerpo de las solicitudes http
+app.use(bodyParser.json());
 
 //conexion base de datos
 try {
@@ -21,7 +26,6 @@ try {
     console.log(error)
 }
 
-app.use(bodyParser.json());
 
 //alta a las rutas
 app.use(productosRoutes)
@@ -29,8 +33,8 @@ app.use(categoriaProductosRoutes)
 app.use(estadoRoutes)
 app.use(usuariosRoutes)
 app.use(ordenDetalleRoutes)
-app.use(authToken)
-
+app.use(authTokenRoutes)
+app.use(ordenDetalleFinal)
 
 
 
