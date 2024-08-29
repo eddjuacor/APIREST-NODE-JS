@@ -91,7 +91,7 @@ export async function actualizarProductos(req, res) {
       },
     });
 
-    res.status(200).json({ message: 'Estado actualizado correctamente' }); 
+    res.status(200).json({ message: 'Producto actualizado correctamente' }); 
   } catch (error) {
     console.error("Error actualizando el producto:", error);
     res.status(500).json({ error: " error al actualizar el produccto" });

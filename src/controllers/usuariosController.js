@@ -92,7 +92,7 @@ export async function actualizarUsuarios(req, res) {
       },
     });
 
-    res.status(200).json({ message: 'Usuario ingresado correctamente' }); 
+    res.status(200).json({ message: 'Usuario Actualizado correctamente' }); 
   } catch (error) {
     console.error("Error actualizando el Usuario:", error);
     res.status(500).json({ error: " error al actualizar el Usuario" });

@@ -8,13 +8,13 @@ const SECRET = process.env.SECRET;
 
 //esta funcion genera un token con el cual vamos a privar nuestros endpoints
 export async function GenerateToken(req, res) {
-  const { idUsuarios, correo_electronico } = req.body;
+  const { idUsuarios, correo_electronico, password } = req.body;
 
   //aqui hacemos la consulta a la base de datos 
   await sequelize.query(
-    `SELECT correo_electronico FROM Usuarios WHERE idUsuarios = :idUsuarios`,
+    `SELECT correo_electronico, password FROM Usuarios WHERE idUsuarios = :idUsuarios`,
     {
-      replacements: { idUsuarios: idUsuarios, correo_electronico },
+      replacements: { idUsuarios: idUsuarios, correo_electronico, password },
       type: sequelize.QueryTypes.SELECT,
     }
   );
