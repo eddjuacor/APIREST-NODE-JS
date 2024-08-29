@@ -95,7 +95,7 @@ export async function actualizarOrdenDetalleFinal(req, res){
       );
     }
 
-    res.status(200).json({ message: 'Detalles de la orden insertados correctamente' });
+    res.status(200).json({ message: 'Detalles de la orden actualizados correctamente' });
   } catch (error) {
     console.error('Error:', error);
     res.status(500).json({ error: 'Error interno del servidor' });
