@@ -1,6 +1,6 @@
 import {Router} from 'express'
 import { insertarOrdenDetalleFinal, actualizarOrdenDetalleFinal } from '../controllers/ordenDetalleFinalController.js';
-import {authenticateToken} from '../controllers/authTokenController.js'
+import {authenticateToken} from '../middleware/authTokenMiddleware.js'
 
 const router = Router();
 
