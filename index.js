@@ -9,6 +9,7 @@ import ordenDetalleRoutes from './src/routes/ordenDetalleRoutes.js'
 import authTokenRoutes from './src/routes/authTokenRoutes.js'
 import ordenDetalleFinal from './src/routes/ordenDetalleFinal.js'
 
+
 //inicializamos express
 const app = express()
 

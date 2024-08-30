@@ -15,6 +15,10 @@ import sequelize from '../config/db.js'
 
     // Iterar sobre los detalles de la orden 
     for (const detalle of ordenDetalles) {
+      if (detalle.error) {
+        throw new Error("error de prueba");
+      }
+      console.log(detalle)
       const {
         nombre_completo,
         direccion,

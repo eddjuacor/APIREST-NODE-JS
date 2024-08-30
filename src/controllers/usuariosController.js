@@ -16,7 +16,11 @@ export async function insertarUsuarios(req, res) {
     } = req.body;
 
     const saltRounds = 10;
-    const hashedPassword = await bcrypt.hash(password, saltRounds);
+    const hashedPassword = await bcrypt.hash(password, saltRounds)
+    const match = await bcrypt.compare(password, hashedPassword);
+    if(match) {
+        console.log("password match")
+    }
 
     const parametros = {
       replacements: {
@@ -62,7 +66,11 @@ export async function actualizarUsuarios(req, res) {
     } = req.body;
 
     const saltRounds = 10;
-    const hashedPassword = await bcrypt.hash(password, saltRounds);
+    const hashedPassword = await bcrypt.hash(password, saltRounds)
+    const match = await bcrypt.compare(password, hashedPassword);
+    if(match) {
+        console.log("password match")
+    }
 
     // Aqui armamos la consulta para el procedimiento almacenado
     const sqlQuery = `

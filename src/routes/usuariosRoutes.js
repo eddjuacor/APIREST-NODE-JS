@@ -4,7 +4,7 @@ import {authenticateToken} from '../controllers/authTokenController.js'
 
 const router = Router();
 
-router.post('/usuarios', authenticateToken, insertarUsuarios)
+router.post('/usuarios',  insertarUsuarios)
 
 router.put('/usuarios/:id', authenticateToken, actualizarUsuarios)
 
