@@ -6,8 +6,8 @@ import categoriaProductosRoutes from './src/routes/categoriaProductosRoutes.js'
 import estadoRoutes from './src/routes/estadosRoutes.js'
 import usuariosRoutes from './src/routes/usuariosRoutes.js'
 import ordenDetalleRoutes from './src/routes/ordenDetalleRoutes.js'
-import authTokenRoutes from './src/routes/authTokenRoutes.js'
-import ordenDetalleFinal from './src/routes/ordenDetalleFinal.js'
+import tokenRoutes from './src/routes/tokenRoutes.js'
+
 
 
 //inicializamos express
@@ -34,8 +34,8 @@ app.use(categoriaProductosRoutes)
 app.use(estadoRoutes)
 app.use(usuariosRoutes)
 app.use(ordenDetalleRoutes)
-app.use(authTokenRoutes)
-app.use(ordenDetalleFinal)
+app.use(tokenRoutes)
+
 
 
 

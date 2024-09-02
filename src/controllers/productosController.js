@@ -1,5 +1,23 @@
 import sequelize from "../config/db.js";
 
+
+export const listarProductos = async (req, res) => {
+  try {
+      const productos = await sequelize.query(
+          `SELECT * FROM Productos`, // Consulta SQL directa
+          {
+              type: sequelize.QueryTypes.SELECT // Especifica el tipo de consulta
+          }
+      );
+
+      res.status(200).json(productos); // Devuelve las categorías en formato JSON
+  } catch (error) {
+      res.status(500).json({ message: 'Error al obtener los productos', error: error.message });
+  }
+};
+
+
+
 export async function insertarProductos(req, res) {
   try {
 

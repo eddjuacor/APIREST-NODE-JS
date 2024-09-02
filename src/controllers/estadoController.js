@@ -1,5 +1,23 @@
 import sequelize from "../config/db.js";
 
+//funcion para listar las categorias de los productos
+
+export const listarEstados = async (req, res) => {
+  try {
+      const estados = await sequelize.query(
+          `SELECT * FROM Estados`, // Consulta SQL directa
+          {
+              type: sequelize.QueryTypes.SELECT // Especifica el tipo de consulta
+          }
+      );
+
+      res.status(200).json(estados); // Devuelve las categorías en formato JSON
+  } catch (error) {
+      res.status(500).json({ message: 'Error al obtener los estados', error: error.message });
+  }
+};
+
+
 //funcion para ejecutar el procedimiento almacenado para insertar insertarEstado
 export async function insertarEstado(req, res) {
   try {

@@ -1,6 +1,23 @@
 import sequelize from "../config/db.js";
 import bcrypt from "bcrypt";
 
+
+
+export const listarUsuarios = async (req, res) => {
+  try {
+      const usuarios = await sequelize.query(
+          `SELECT * FROM Productos`, // Consulta SQL directa
+          {
+              type: sequelize.QueryTypes.SELECT // Especifica el tipo de consulta
+          }
+      );
+
+      res.status(200).json(usuarios); // Devuelve las categorías en formato JSON
+  } catch (error) {
+      res.status(500).json({ message: 'Error al obtener los usuarios', error: error.message });
+  }
+};
+
 export async function insertarUsuarios(req, res) {
   try {
     const sp_InsertarUsuarios = "sp_InsertarUsuarios"; // Nombre del procedimiento almacenado
@@ -15,12 +32,19 @@ export async function insertarUsuarios(req, res) {
       fecha_nacimiento,
     } = req.body;
 
-    const saltRounds = 10;
+
+
+    const saltRounds = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, saltRounds)
-    const match = await bcrypt.compare(password, hashedPassword);
-    if(match) {
-        console.log("password match")
-    }
+    async (plainPassword, hashedPassword) => {
+      try {
+        const isMatch = await bcrypt.compare(plainPassword, hashedPassword);
+        return isMatch;
+      } catch (error) {
+        console.error('Error al comparar la contraseña:', error);
+        throw error;
+      }
+    };
 
     const parametros = {
       replacements: {

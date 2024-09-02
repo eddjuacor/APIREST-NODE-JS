@@ -1,9 +1,10 @@
 import {Router} from 'express'
-import { insertarProductos, actualizarProductos } from '../controllers/productosController.js';
-import {authenticateToken} from '../middleware/authTokenMiddleware.js'
+import { listarProductos, insertarProductos, actualizarProductos } from '../controllers/productosController.js';
+import { authenticateToken}  from '../middleware/autenticacionMiddleware.js';
 
 const router = Router();
 
+router.get('/productos', authenticateToken, listarProductos)
 
 router.post('/productos', authenticateToken, insertarProductos)
 

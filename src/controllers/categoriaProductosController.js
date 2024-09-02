@@ -1,5 +1,24 @@
 import sequelize from "../config/db.js";
 
+//funcion para listar las categorias de los productos
+
+export const listarCategoriaProductos = async (req, res) => {
+  try {
+      const categorias = await sequelize.query(
+          `SELECT * FROM categoriaProductos`, // Consulta SQL directa
+          {
+              type: sequelize.QueryTypes.SELECT // Especifica el tipo de consulta
+          }
+      );
+
+      res.status(200).json(categorias); // Devuelve las categorías en formato JSON
+  } catch (error) {
+      res.status(500).json({ message: 'Error al obtener las categorías de productos', error: error.message });
+  }
+};
+
+
+
 
 //funcion para ejecutar el procedimiento almacenado para insertar productos
 export async function insertarCategoriaProductos(req, res) {

@@ -1,12 +1,13 @@
 import {Router} from 'express'
-import { insertarOrdenDetalles, actualizarOrdenDetalle } from '../controllers/ordenDetallesController.js';
-import {authenticateToken} from '../middleware/authTokenMiddleware.js'
+import { listarOrdenes, crearOrden, ordenUpdate  } from '../controllers/ordenDetalleController.js';
+import { authenticateToken}  from '../middleware/autenticacionMiddleware.js';
 
 const router = Router();
 
+router.get('/ordenDetalles', authenticateToken, listarOrdenes)
 
-router.post('/ordenDetalles', authenticateToken, insertarOrdenDetalles)
+router.post('/ordenDetalles', authenticateToken,  crearOrden )
 
-router.put('/ordenDetalles/:id', authenticateToken,  actualizarOrdenDetalle)
+router.put('/ordenDetalles/:id', authenticateToken, ordenUpdate)
 
 export default router;
