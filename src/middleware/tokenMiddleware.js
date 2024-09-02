@@ -36,11 +36,9 @@ dotenv.config({path:'.env'})
 export async function adminRole(req, res, next) {
  
     try {
-      // `req.user` debería contener la información del usuario después de `authenticateToken`
 
       const idRol = req.user.idRol; // Rol obtenido del token
     
-      // Consulta a la base de datos para obtener el nombre del rol (si es necesario)
       const result = await sequelize.query(
         'SELECT nombre, idRol FROM Rol WHERE idRol = idRol',
         {
@@ -53,14 +51,14 @@ export async function adminRole(req, res, next) {
         return res.status(404).json({ message: 'Rol no encontrado' });
       }
   
-      const rolDesdeDB = result[0].idRol; // Asumiendo que el campo es 'nombre'
+      const rolDesdeDB = result[0].idRol;
   
-      // Comparar el rol del token con 'Admin'
+       // comparamos el rol de la base con el rol del toekn
       if (rolDesdeDB !== req.user.idRol) {
         return res.status(403).json({ message: 'Acceso denegado: No tienes el rol de Admin' });
       }
   
-      next(); // Si el rol es Admin, continúa al siguiente middleware o ruta
+      next(); // pesto es para que el usuario continue al proximo middleware
     } catch (error) {
       console.error('Error al verificar el rol de Admin desde la base de datos:', error);
       res.status(500).json({ message: 'Error interno del servidor' });
@@ -73,7 +71,7 @@ export async function usuarioRole(req, res, next) {
 
     const idRol = req.user.idRol; // Rol obtenido del token
   
-    // Consulta a la base de datos para obtener el nombre del rol (si es necesario)
+    // Consulta a la base de datos para obtener el nombre del rol
     const result = await sequelize.query(
       'SELECT nombre, idRol FROM Rol WHERE idRol = idRol',
       {
@@ -88,17 +86,19 @@ export async function usuarioRole(req, res, next) {
 
     const rolDesdeDB = result[1].idRol;
 
-    // Comparar el rol del token con 'Usuario'
-    if (rolDesdeDB !== req.user.idRol) {
+    // comparamos el rol de la base con el rol del toekn
+    if (rolDesdeDB !== req.user.idRol ) {
       return res.status(403).json({ message: 'Acceso denegado: No tienes el rol de Usuario' });
     }
 
-    next(); // Si el rol es Usuario, continúa al siguiente middleware o ruta
+    next(); // pesto es para que el usuario continue al proximo middleware
   } catch (error) {
     console.error('Error al verificar el rol de Admin desde la base de datos:', error);
     res.status(500).json({ message: 'Error interno del servidor' });
   }
 };
+
+
 
 
 
