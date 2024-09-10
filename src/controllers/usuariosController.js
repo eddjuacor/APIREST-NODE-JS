@@ -6,7 +6,7 @@ import bcrypt from "bcrypt";
 export const listarUsuarios = async (req, res) => {
   try {
       const usuarios = await sequelize.query(
-          `SELECT * FROM Productos`, // Consulta SQL directa
+          `SELECT * FROM Usuarios`, // Consulta SQL directa
           {
               type: sequelize.QueryTypes.SELECT // Especifica el tipo de consulta
           }

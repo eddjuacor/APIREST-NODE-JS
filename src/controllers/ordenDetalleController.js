@@ -4,6 +4,7 @@ import sequelize from '../config/db.js';
 // get orden detalle
 export const listarOrdenes = async (req, res) => {
   try {
+    const { idOrden } = req.params;
 
     const resultado = await sequelize.query(
       `SELECT 
@@ -34,18 +35,30 @@ FROM
 WHERE 
     o.idOrden = idOrden;`,
       {
-          
+          replacements: { idOrden },
           type: sequelize.QueryTypes.SELECT
       }
   );
 
   console.log('Resultado:', resultado); 
 
+  if (resultado.length === 0) {
+    return res.status(404).json({ message: 'Orden no encontrada' });
+  }
 
-  res.status(200).json(JSON.parse(resultado[0][''])); // Parsear el resultado para enviar como JSON
-} catch (error) {
+  // Asumiendo que resultado es un array, y el primer elemento es el que necesitamos
+  const orden = resultado[0];
+
+   // La columna 'detalles' puede contener una cadena JSON que necesitamos analizar
+   if (orden.detalles) {
+    orden.detalles = JSON.parse(orden.detalles);
+  }
+
+  res.status(200).json(orden);
+  } catch (error) {
+    console.error('Error al obtener la orden:', error.message);
     res.status(500).json({ message: 'Error al obtener la orden con detalles', error: error.message });
-}
+  }
 };
 
 
@@ -63,7 +76,7 @@ export const crearOrden = async (req, res) => {
     // Ejecuta el procedimiento almacenado para insertar la orden
     const [orderResult] = await sequelize.query(
       `DECLARE @idOrden INT;
-         EXEC sp_UpdateDetalleOrden 
+         EXEC InsertarOrden 
            @idUsuarios = :idUsuarios,
            @idEstados = :idEstados,
            @nombre_completo = :nombre_completo,

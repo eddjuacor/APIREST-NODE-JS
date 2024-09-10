@@ -8,7 +8,8 @@ import usuariosRoutes from './src/routes/usuariosRoutes.js'
 import ordenDetalleRoutes from './src/routes/ordenDetalleRoutes.js'
 import tokenRoutes from './src/routes/tokenRoutes.js'
 
-
+//importar cors esto me permite intercambiar informacion entre el front y el back
+import cors from 'cors'
 
 //inicializamos express
 const app = express()
@@ -18,6 +19,9 @@ app.use(express.json())
 
 // para analizar el cuerpo de las solicitudes http
 app.use(bodyParser.json());
+
+// inicializar los cors
+app.use(cors())
 
 //conexion base de datos
 try {
