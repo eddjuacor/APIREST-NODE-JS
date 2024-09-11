@@ -66,7 +66,7 @@ export async function adminRole(req, res, next) {
     }
 };
 
-export async function usuarioRole(req, res, next) {
+export async function operadorRol(req, res, next) {
  
   try {
 
@@ -85,11 +85,46 @@ export async function usuarioRole(req, res, next) {
       return res.status(404).json({ message: 'Rol no encontrado' });
     }
 
-    const rolDesdeDB = result[1].idRol;
+    const rolDesdeDB = result[2].idRol;
 
     // comparamos el rol de la base con el rol del toekn
     if (rolDesdeDB !== req.user.idRol ) {
-      return res.status(403).json({ message: 'Acceso denegado: No tienes el rol de Usuario' });
+      return res.status(403).json({ message: 'Acceso denegado: No tienes el rol de Operador' });
+    }
+
+    next(); // pesto es para que el usuario continue al proximo middleware
+  } catch (error) {
+    console.error('Error al verificar el rol de Admin desde la base de datos:', error);
+    res.status(500).json({ message: 'Error interno del servidor' });
+  }
+};
+
+
+
+export async function clienteRol(req, res, next) {
+ 
+  try {
+
+    const idRol = req.user.idRol; // Rol obtenido del token
+  
+    // Consulta a la base de datos para obtener el nombre del rol
+    const result = await sequelize.query(
+      'SELECT nombre, idRol FROM Rol WHERE idRol = idRol',
+      {
+        replacements: { idRol },
+        type: sequelize.QueryTypes.SELECT
+      }
+    );
+
+    if (result.length === 0) {
+      return res.status(404).json({ message: 'Rol no encontrado' });
+    }
+
+    const rolDesdeDB = result[3].idRol;
+
+    // comparamos el rol de la base con el rol del toekn
+    if (rolDesdeDB !== req.user.idRol ) {
+      return res.status(403).json({ message: 'Acceso denegado: solo Operadores' });
     }
 
     next(); // pesto es para que el usuario continue al proximo middleware

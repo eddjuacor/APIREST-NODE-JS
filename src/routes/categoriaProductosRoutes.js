@@ -1,15 +1,15 @@
 import {Router} from 'express'
 import { listarCategoriaProductos, insertarCategoriaProductos, actualizarCategoriaProductos } from '../controllers/categoriaProductosController.js';
 import { authenticateToken}  from '../middleware/autenticacionMiddleware.js';
-import { adminRole, usuarioRole } from '../middleware/tokenMiddleware.js';
+
 
 
 const router = Router();
 
-router.get('/Categoriaproductos',  authenticateToken, usuarioRole, listarCategoriaProductos)
+router.get('/Categoriaproductos',  authenticateToken,  listarCategoriaProductos)
 
-router.post('/Categoriaproductos', authenticateToken, adminRole,  insertarCategoriaProductos)
+router.post('/Categoriaproductos', authenticateToken,   insertarCategoriaProductos)
 
-router.put('/Categoriaproductos/:id', authenticateToken, adminRole, actualizarCategoriaProductos)
+router.put('/Categoriaproductos/:id', authenticateToken,  actualizarCategoriaProductos)
 
 export default router;

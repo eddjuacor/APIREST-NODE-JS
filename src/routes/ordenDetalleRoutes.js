@@ -1,14 +1,14 @@
 import {Router} from 'express'
 import { listarOrdenes, crearOrden, ordenUpdate  } from '../controllers/ordenDetalleController.js';
 import { authenticateToken}  from '../middleware/autenticacionMiddleware.js';
-import { adminRole, usuarioRole } from '../middleware/tokenMiddleware.js';
+
 
 const router = Router();
 
-router.get('/ordenDetalles', authenticateToken, usuarioRole, listarOrdenes)
+router.get('/ordenDetalles', authenticateToken,  listarOrdenes)
 
-router.post('/ordenDetalles', authenticateToken, adminRole,  crearOrden )
+router.post('/ordenDetalles', authenticateToken,   crearOrden )
 
-router.put('/ordenDetalles/:id', authenticateToken, adminRole, ordenUpdate)
+router.put('/ordenDetalles/:id', authenticateToken,  ordenUpdate)
 
 export default router;
