@@ -1,10 +1,10 @@
 import {Router} from 'express'
 
-import { generarToken } from "../middleware/tokenMiddleware.js";
+import { login } from "../middleware/tokenMiddleware.js";
 
 
 const router = Router();
 
-router.post('/login',  generarToken)
+router.post('/login',  login)
 
 export default router;

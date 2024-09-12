@@ -18,10 +18,14 @@ export const listarUsuarios = async (req, res) => {
   }
 };
 
+
+
+//insertar usuario
+
+// Función para insertar usuarios
+// Función para insertar usuarios
 export async function insertarUsuarios(req, res) {
   try {
-    const sp_InsertarUsuarios = "sp_InsertarUsuarios"; // Nombre del procedimiento almacenado
-
     const {
       idEstados,
       idRol,
@@ -32,46 +36,48 @@ export async function insertarUsuarios(req, res) {
       fecha_nacimiento,
     } = req.body;
 
+    // Validaciones básicas
+    if (!correo_electronico || !password) {
+      return res.status(400).json({ message: 'Correo electrónico y contraseña son obligatorios' });
+    }
 
+    // Validación del formato del correo electrónico
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(correo_electronico)) {
+      return res.status(400).json({ message: 'Formato de correo electrónico inválido' });
+    }
 
-    const saltRounds = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, saltRounds)
-    async (plainPassword, hashedPassword) => {
-      try {
-        const isMatch = await bcrypt.compare(plainPassword, hashedPassword);
-        return isMatch;
-      } catch (error) {
-        console.error('Error al comparar la contraseña:', error);
-        throw error;
-      }
-    };
+    // Validación de la contraseña (puedes ajustar según requisitos específicos)
+    if (password.length < 6) {
+      return res.status(400).json({ message: 'La contraseña debe tener al menos 6 caracteres' });
+    }
 
+    // Hash de la contraseña
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+    // Parámetros para el procedimiento almacenado
     const parametros = {
-      replacements: {
-        idEstados,
-        idRol,
-        correo_electronico,
-        nombre_completo,
-        password: hashedPassword,
-        telefono,
-        fecha_nacimiento,
-      },
-      type: sequelize.QueryTypes.SELECT,
+      idEstados,
+      idRol,
+      correo_electronico,
+      nombre_completo,
+      password: hashedPassword,
+      telefono,
+      fecha_nacimiento
     };
 
+    // Ejecución del procedimiento almacenado
     await sequelize.query(
-      `EXEC ${sp_InsertarUsuarios} :idEstados, :idRol, :correo_electronico, :nombre_completo, :password, :telefono, :fecha_nacimiento`,
-      parametros
+      `EXEC sp_InsertarUsuarios @idEstados = :idEstados, @idRol = :idRol, @correo_electronico = :correo_electronico, @nombre_completo = :nombre_completo, @password = :password, @telefono = :telefono, @fecha_nacimiento = :fecha_nacimiento`,
+      { replacements: parametros }
     );
 
-    res.status(200).json({ message: 'Usuario ingresado correctamente' }); 
+    res.status(200).json({ message: 'Usuario ingresado correctamente' });
   } catch (error) {
+    // Manejo de errores
     console.error("Error ejecutando el procedimiento almacenado:", error);
-    res
-      .status(500)
-      .json({
-        error: "Ocurrió un error al ejecutar el procedimiento almacenado",
-      });
+    res.status(500).json({ message: "Ocurrió un error al ejecutar el procedimiento almacenado", error: error.message });
   }
 }
 
@@ -90,43 +96,36 @@ export async function actualizarUsuarios(req, res) {
     } = req.body;
 
     const saltRounds = 10;
-    const hashedPassword = await bcrypt.hash(password, saltRounds)
-    const match = await bcrypt.compare(password, hashedPassword);
-    if(match) {
-        console.log("password match")
-    }
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-    // Aqui armamos la consulta para el procedimiento almacenado
     const sqlQuery = `
-          EXEC sp_UpdateUsuarios 
-            @idUsuarios = :idUsuarios,
-            @idEstados = :idEstados,
-            @idRol = :idRol,
-            @correo_electronico = :correo_electronico,
-            @nombre_completo = :nombre_completo,
-            @password = :password,
-            @telefono = :telefono,
-            @fecha_nacimiento = :fecha_nacimiento
-            
-        `;
+      EXEC sp_UpdateUsuarios 
+        @idUsuarios = :idUsuarios,
+        @idEstados = :idEstados,
+        @idRol = :idRol,
+        @correo_electronico = :correo_electronico,
+        @nombre_completo = :nombre_completo,
+        @password = :password,
+        @telefono = :telefono,
+        @fecha_nacimiento = :fecha_nacimiento
+    `;
 
-    // Aqui ejecturo el procedimiento almacenado
     await sequelize.query(sqlQuery, {
       replacements: {
-        idUsuarios: idUsuarios,
-        idEstados: idEstados,
-        idRol: idRol,
-        correo_electronico: correo_electronico,
-        nombre_completo: nombre_completo,
+        idUsuarios,
+        idEstados,
+        idRol,
+        correo_electronico,
+        nombre_completo,
         password: hashedPassword,
-        telefono: telefono,
-        fecha_nacimiento: fecha_nacimiento,
+        telefono,
+        fecha_nacimiento,
       },
     });
 
-    res.status(200).json({ message: 'Usuario Actualizado correctamente' }); 
+    res.status(200).json({ message: 'Usuario actualizado correctamente' }); 
   } catch (error) {
     console.error("Error actualizando el Usuario:", error);
-    res.status(500).json({ error: " error al actualizar el Usuario" });
+    res.status(500).json({ error: "Error al actualizar el Usuario" });
   }
 }

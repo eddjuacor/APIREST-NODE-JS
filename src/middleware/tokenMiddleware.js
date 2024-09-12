@@ -1,157 +1,96 @@
+import bcrypt from "bcrypt";
 import jwt from 'jsonwebtoken';
-import sequelize from '../config/db.js'; // El archivo de configuración de sequelize
+import sequelize from '../config/db.js';
 import dotenv from 'dotenv'
 
 //variables de entorno, lo utilizo, env para no dejar a primera vista los datos de conexion
 dotenv.config({path:'.env'})
 
-export async function generarToken(req, res) {
+export async function login(req, res) {
   const { correo_electronico, password } = req.body;
 
   try {
-    // Consulta para verificar las credenciales del usuario
+    // Consulta para obtener el usuario con el correo electrónico proporcionado
     const result = await sequelize.query(
-      'SELECT idUsuarios, correo_electronico, idRol FROM Usuarios WHERE correo_electronico = :correo_electronico AND password = :password',
+      'SELECT idUsuarios, password FROM Usuarios WHERE correo_electronico = :correo_electronico',
       {
-        replacements: { correo_electronico, password },
+        replacements: { correo_electronico },
         type: sequelize.QueryTypes.SELECT
       }
     );
 
-    // Si el usuario existe
-    if (result.length > 0) {
-      const user = {
-        idUsuarios: result[0].idUsuarios,
-        correo_electronico: result[0].correo_electronico,
-        idRol: result[0].idRol
-      };
-
-      // Genera el token JWT
-      const accessToken = jwt.sign(user, process.env.SECRET, { expiresIn: '24h' });
-
-      // Envia el token en la respuesta
-      res.json({ accessToken });
-    } else {
-      // Credenciales inválidas
-      res.status(401).json({ message: 'Credenciales inválidas' });
+    if (result.length === 0) {
+      return res.status(401).json({ message: 'Credenciales inválidas' });
     }
+
+    const user = result[0];
+
+    // comparando contraseñas
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (!isMatch) {
+      return res.status(401).json({ message: 'Credenciales inválidas' });
+    }
+
+      // Genera y firmar token
+      const token = jwt.sign(
+        { idUsuarios: user.idUsuarios, idRol: user.idRol }, 
+        process.env.SECRET,
+        { expiresIn: '24h' } 
+      );
+
+    
+    res.status(200).json({ message: 'Inicio de sesión exitoso', token });
+    
   } catch (error) {
-    // Manejo de errores
-    console.error('Error en /login:', error);
+    console.error('Error en el proceso de login:', error);
     res.status(500).json({ message: 'Error en el servidor', error });
   }
-};
+}
 
 
 
-export async function adminRole(req, res, next) {
- 
+// obtener el rol desde la base de datos
+async function getRoleById(idRol) {
+  try {
+    console.log(`Consultando el rol con idRol: ${idRol}`);
+    const result = await sequelize.query(
+      'SELECT nombre FROM Rol WHERE idRol = :idRol',
+      {
+        replacements: { idRol },
+        type: sequelize.QueryTypes.SELECT
+      }
+    );
+    return result.length > 0 ? result[0].nombre : null;
+  } catch (error) {
+    console.error('Error al consultar el rol desde la base de datos:', error);
+    throw new Error('Error al consultar el rol desde la base de datos');
+  }
+}
+
+// Verificando roles permitidos
+export function requireRoles(roles) {
+  return async (req, res, next) => {
     try {
+      const userRole = req.user.idRol;
+      const roleName = await getRoleById(userRole);
 
-      const idRol = req.user.idRol; // Rol obtenido del token
-    
-      const result = await sequelize.query(
-        'SELECT nombre, idRol FROM Rol WHERE idRol = idRol',
-        {
-          replacements: { idRol },
-          type: sequelize.QueryTypes.SELECT
-        }
-      );
-  
-      if (result.length === 0) {
+      console.log(`Rol del usuario: ${roleName}`);
+      console.log(`Roles permitidos: ${roles.join(', ')}`);
+
+      if (!roleName) {
         return res.status(404).json({ message: 'Rol no encontrado' });
       }
-  
-      const rolDesdeDB = result[0].idRol;
-  
-       // comparamos el rol de la base con el rol del toekn
-      if (rolDesdeDB !== req.user.idRol) {
-        return res.status(403).json({ message: 'Acceso denegado: No tienes el rol de Admin' });
+
+      // Verifica si el rol del usuario esta en la lista de roles permitidos
+      if (!roles.includes(roleName)) {
+        return res.status(403).json({ message: 'Acceso denegado: No tienes el rol necesario' });
       }
-  
-      next(); // pesto es para que el usuario continue al proximo middleware
+
+      next();
     } catch (error) {
-      console.error('Error al verificar el rol de Admin desde la base de datos:', error);
+      console.error('Error al verificar los roles desde la base de datos:', error);
       res.status(500).json({ message: 'Error interno del servidor' });
     }
-};
-
-export async function operadorRol(req, res, next) {
- 
-  try {
-
-    const idRol = req.user.idRol; // Rol obtenido del token
-  
-    // Consulta a la base de datos para obtener el nombre del rol
-    const result = await sequelize.query(
-      'SELECT nombre, idRol FROM Rol WHERE idRol = idRol',
-      {
-        replacements: { idRol },
-        type: sequelize.QueryTypes.SELECT
-      }
-    );
-
-    if (result.length === 0) {
-      return res.status(404).json({ message: 'Rol no encontrado' });
-    }
-
-    const rolDesdeDB = result[2].idRol;
-
-    // comparamos el rol de la base con el rol del toekn
-    if (rolDesdeDB !== req.user.idRol ) {
-      return res.status(403).json({ message: 'Acceso denegado: No tienes el rol de Operador' });
-    }
-
-    next(); // pesto es para que el usuario continue al proximo middleware
-  } catch (error) {
-    console.error('Error al verificar el rol de Admin desde la base de datos:', error);
-    res.status(500).json({ message: 'Error interno del servidor' });
-  }
-};
-
-
-
-export async function clienteRol(req, res, next) {
- 
-  try {
-
-    const idRol = req.user.idRol; // Rol obtenido del token
-  
-    // Consulta a la base de datos para obtener el nombre del rol
-    const result = await sequelize.query(
-      'SELECT nombre, idRol FROM Rol WHERE idRol = idRol',
-      {
-        replacements: { idRol },
-        type: sequelize.QueryTypes.SELECT
-      }
-    );
-
-    if (result.length === 0) {
-      return res.status(404).json({ message: 'Rol no encontrado' });
-    }
-
-    const rolDesdeDB = result[3].idRol;
-
-    // comparamos el rol de la base con el rol del toekn
-    if (rolDesdeDB !== req.user.idRol ) {
-      return res.status(403).json({ message: 'Acceso denegado: solo Operadores' });
-    }
-
-    next(); // pesto es para que el usuario continue al proximo middleware
-  } catch (error) {
-    console.error('Error al verificar el rol de Admin desde la base de datos:', error);
-    res.status(500).json({ message: 'Error interno del servidor' });
-  }
-};
-
-
-
-
-
-
-
-
-
-
-
-
+  };
+}
