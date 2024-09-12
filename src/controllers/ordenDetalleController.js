@@ -104,10 +104,16 @@ export const crearOrden = async (req, res) => {
       }
     );
 
+
     const idOrden = orderResult.idOrden; // Captura el ID de la orden recién creada
     console.log(idOrden)
-    // Ejecuta el procedimiento almacenado para insertar los detalles de la orden
-    for (const detalle of detalles) {
+
+    
+ // Ejecuta el procedimiento almacenado para insertar los detalles de la orden
+ for (const detalle of detalles) {
+  if (typeof detalle !== 'object' || !detalle.idProductos || !detalle.cantidad || !detalle.precio || !detalle.subtotal) {
+    throw new Error('Detalle de la orden no es válido.');
+  }
       await sequelize.query(
         `EXEC [sp_InsertarDetalleOrden] 
             @idOrden = :idOrden,

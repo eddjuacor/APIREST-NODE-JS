@@ -5,33 +5,43 @@ import dotenv from 'dotenv'
 //variables de entorno, lo utilizo, env para no dejar a primera vista los datos de conexion
 dotenv.config({path:'.env'})
 
-  export async function generarToken (req, res) {
-
+export async function generarToken(req, res) {
   const { correo_electronico, password } = req.body;
- 
 
   try {
+    // Consulta para verificar las credenciales del usuario
     const result = await sequelize.query(
       'SELECT idUsuarios, correo_electronico, idRol FROM Usuarios WHERE correo_electronico = :correo_electronico AND password = :password',
       {
-        replacements: {  correo_electronico, password },
+        replacements: { correo_electronico, password },
         type: sequelize.QueryTypes.SELECT
       }
     );
-    console.log(result)
 
+    // Si el usuario existe
     if (result.length > 0) {
-      const user = { idUsuarios: result[0].idUsuarios, correo_electronico: result[0].correo_electronico, idRol: result[0].idRol};
+      const user = {
+        idUsuarios: result[0].idUsuarios,
+        correo_electronico: result[0].correo_electronico,
+        idRol: result[0].idRol
+      };
+
+      // Genera el token JWT
       const accessToken = jwt.sign(user, process.env.SECRET, { expiresIn: '24h' });
+
+      // Envia el token en la respuesta
       res.json({ accessToken });
     } else {
+      // Credenciales inválidas
       res.status(401).json({ message: 'Credenciales inválidas' });
     }
   } catch (error) {
+    // Manejo de errores
     console.error('Error en /login:', error);
     res.status(500).json({ message: 'Error en el servidor', error });
   }
 };
+
 
 
 export async function adminRole(req, res, next) {

@@ -7,19 +7,23 @@ import dotenv from 'dotenv'
 dotenv.config({path:'.env'})
 
 
-export async function authenticateToken (req, res, next) {
-  const token = req.headers['authorization'];
-  if (!token) {
+export async function authenticateToken(req, res, next) {
+  const authHeader = req.headers['authorization'];
+
+  if (!authHeader || !authHeader.startsWith('Bearer')) {
     return res.status(401).json({ message: 'Token no proporcionado' });
   }
+
+  const token = authHeader.split(' ')[1];
+
   jwt.verify(token, process.env.SECRET, (err, user) => {
-    if (err) return res.sendStatus(403);
+    if (err) {
+      return res.status(403).json({ message: 'Token no válido' });
+    }
     req.user = user;
     next();
   });
-
-};
-
+}
 
 
 
