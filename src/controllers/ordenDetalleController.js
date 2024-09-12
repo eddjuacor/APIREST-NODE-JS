@@ -4,63 +4,92 @@ import sequelize from '../config/db.js';
 // get orden detalle
 export const listarOrdenes = async (req, res) => {
   try {
-    const { idOrden } = req.params;
-
     const resultado = await sequelize.query(
       `SELECT 
-    o.idUsuarios,
-    o.idEstados,
-    o.fecha_creacion,
-    o.nombre_completo,
-    o.direccion,
-    o.telefono,
-    o.correo_electronico,
-    o.fecha_entrega,
-    o.total_orden,
-    (
-        SELECT 
-            od.idProductos, 
-            od.cantidad, 
-            od.precio, 
-            od.subtotal
-                
-        FROM 
-            OrdenDetalles od
-        WHERE 
-            od.idOrden = o.idOrden
-        FOR JSON PATH
-    ) AS detalles
-FROM 
-    Orden o
-WHERE 
-    o.idOrden = idOrden;`,
+        o.idOrden, 
+        o.idUsuarios,
+        o.idEstados,
+        o.fecha_creacion,
+        o.nombre_completo,
+        o.direccion,
+        o.telefono,
+        o.correo_electronico,
+        o.fecha_entrega,
+        o.total_orden,
+        (
+            SELECT 
+                od.idProductos, 
+                od.cantidad, 
+                od.precio, 
+                od.subtotal
+            FROM 
+                OrdenDetalles od
+            WHERE 
+                od.idOrden = o.idOrden
+            FOR JSON PATH
+        ) AS detalles
+      FROM 
+        Orden o
+      FOR JSON PATH;`,
       {
-          replacements: { idOrden },
-          type: sequelize.QueryTypes.SELECT
+        type: sequelize.QueryTypes.SELECT
       }
-  );
+    );
 
-  console.log('Resultado:', resultado); 
+    console.log('Resultado:', resultado);
 
-  if (resultado.length === 0) {
-    return res.status(404).json({ message: 'Orden no encontrada' });
-  }
-
-  // Asumiendo que resultado es un array, y el primer elemento es el que necesitamos
-  const orden = resultado[0];
-
-   // La columna 'detalles' puede contener una cadena JSON que necesitamos analizar
-   if (orden.detalles) {
-    orden.detalles = JSON.parse(orden.detalles);
-  }
-
-  res.status(200).json(orden);
+    // El resultado ya está en formato JSON en SQL Server
+    res.status(200).json(resultado);
   } catch (error) {
-    console.error('Error al obtener la orden:', error.message);
-    res.status(500).json({ message: 'Error al obtener la orden con detalles', error: error.message });
+    console.error('Error al obtener las órdenes:', error.message);
+    res.status(500).json({ message: 'Error al obtener las órdenes con detalles', error: error.message });
   }
 };
 
+
+export const listarOrden = async (req, res) => {
+  try {
+    const resultado = await sequelize.query(
+      `SELECT 
+        o.idOrden, 
+        o.idUsuarios,
+        o.idEstados,
+        o.fecha_creacion,
+        o.nombre_completo,
+        o.direccion,
+        o.telefono,
+        o.correo_electronico,
+        o.fecha_entrega,
+        o.total_orden,
+        (
+            SELECT 
+                od.idProductos, 
+                od.cantidad, 
+                od.precio, 
+                od.subtotal
+            FROM 
+                OrdenDetalles od
+            WHERE 
+                od.idOrden = o.idOrden
+            FOR JSON PATH
+        ) AS detalles
+      FROM 
+        Orden o
+      FOR JSON PATH;`,
+      {
+        type: sequelize.QueryTypes.SELECT
+      }
+    );
+
+    console.log('Resultado:', resultado);
+
+    // El resultado ya está en formato JSON en SQL Server
+    res.status(200).json(resultado);
+  } catch (error) {
+    console.error('Error al obtener las órdenes:', error.message);
+    res.status(500).json({ message: 'Error al obtener las órdenes con detalles', error: error.message });
+  }
+};
 
 
 //insertar Orden detalles
