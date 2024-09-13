@@ -47,7 +47,14 @@ export const listarOrdenes = async (req, res) => {
 };
 
 
+//listar por id
 export const listarOrden = async (req, res) => {
+  const { idOrden } = req.params;
+
+  if (!idOrden) {
+    return res.status(400).json({ message: 'El parámetro idOrden es requerido.' });
+  }
+
   try {
     const resultado = await sequelize.query(
       `SELECT 
@@ -75,8 +82,11 @@ export const listarOrden = async (req, res) => {
         ) AS detalles
       FROM 
         Orden o
+      WHERE 
+        o.idOrden = :idOrden
       FOR JSON PATH;`,
       {
+        replacements: { idOrden },
         type: sequelize.QueryTypes.SELECT
       }
     );
@@ -86,8 +96,8 @@ export const listarOrden = async (req, res) => {
     // El resultado ya está en formato JSON en SQL Server
     res.status(200).json(resultado);
   } catch (error) {
-    console.error('Error al obtener las órdenes:', error.message);
-    res.status(500).json({ message: 'Error al obtener las órdenes con detalles', error: error.message });
+    console.error('Error al obtener la orden:', error.message);
+    res.status(500).json({ message: 'Error al obtener la orden con detalles', error: error.message });
   }
 };
 

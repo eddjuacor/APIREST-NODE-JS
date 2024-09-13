@@ -1,10 +1,10 @@
-import bcrypt from "bcrypt";
+import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import sequelize from '../config/db.js';
-import dotenv from 'dotenv'
+import dotenv from 'dotenv';
 
-//variables de entorno, lo utilizo, env para no dejar a primera vista los datos de conexion
-dotenv.config({path:'.env'})
+dotenv.config({ path: '.env' });
+console.log(dotenv)
 
 export async function login(req, res) {
   const { correo_electronico, password } = req.body;
@@ -12,12 +12,14 @@ export async function login(req, res) {
   try {
     // Consulta para obtener el usuario con el correo electrónico proporcionado
     const result = await sequelize.query(
-      'SELECT idUsuarios, password FROM Usuarios WHERE correo_electronico = :correo_electronico',
+      'SELECT idUsuarios, password, idRol FROM Usuarios WHERE correo_electronico = :correo_electronico',
       {
         replacements: { correo_electronico },
         type: sequelize.QueryTypes.SELECT
       }
     );
+
+    console.log(result)
 
     if (result.length === 0) {
       return res.status(401).json({ message: 'Credenciales inválidas' });
@@ -25,28 +27,28 @@ export async function login(req, res) {
 
     const user = result[0];
 
-    // comparando contraseñas
+    // Comparando contraseñas
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
       return res.status(401).json({ message: 'Credenciales inválidas' });
     }
 
-      // Genera y firmar token
-      const token = jwt.sign(
-        { idUsuarios: user.idUsuarios, idRol: user.idRol }, 
-        process.env.SECRET,
-        { expiresIn: '24h' } 
-      );
+    // Genera y firma el token
+    const token = jwt.sign(
+      { idUsuarios: user.idUsuarios, idRol: user.idRol },
+      process.env.SECRET,
+      { expiresIn: '24h' }
+    );
 
-    
     res.status(200).json({ message: 'Inicio de sesión exitoso', token });
-    
+
   } catch (error) {
     console.error('Error en el proceso de login:', error);
     res.status(500).json({ message: 'Error en el servidor', error });
   }
 }
+
 
 
 
