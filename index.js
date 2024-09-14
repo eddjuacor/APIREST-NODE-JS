@@ -7,12 +7,23 @@ import estadoRoutes from './src/routes/estadosRoutes.js'
 import usuariosRoutes from './src/routes/usuariosRoutes.js'
 import ordenDetalleRoutes from './src/routes/ordenDetalleRoutes.js'
 import tokenRoutes from './src/routes/tokenRoutes.js'
-
-//importar cors esto me permite intercambiar informacion entre el front y el back
+import ordenGroup from './src/routes/ordenGroup.js'
 import cors from 'cors'
+
+import path from 'path';
+import { fileURLToPath } from 'url';
+
 
 //inicializamos express
 const app = express()
+
+// Estas dos líneas reemplazan el uso de __dirname en ES Modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+
+app.use('/uploads', express.static(path.join(__dirname, '/uploads')));
+
 
 //configuaamos el middleware para analizar las solicitudes http
 app.use(express.json()) 
@@ -39,6 +50,7 @@ app.use(estadoRoutes)
 app.use(usuariosRoutes)
 app.use(ordenDetalleRoutes)
 app.use(tokenRoutes)
+app.use(ordenGroup)
 
 
 

@@ -9,7 +9,7 @@ router.get('/ordenDetalles', authenticateToken, requireRoles([ 'Admin', 'Operado
 
 router.get('/ordenDetalles/:idOrden', authenticateToken, requireRoles([ 'Admin', 'Operador']),  listarOrden)
 
-router.post('/ordenDetalles', authenticateToken, requireRoles([ 'Admin', 'Operador']),  crearOrden )
+router.post('/ordenDetalles', authenticateToken, requireRoles([ 'Cliente', 'Admin', 'Operador']),  crearOrden )
 
 router.put('/ordenDetalles/:id', authenticateToken, requireRoles([ 'Admin', 'Operador']), ordenUpdate)
 

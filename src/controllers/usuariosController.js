@@ -20,9 +20,6 @@ export const listarUsuarios = async (req, res) => {
 
 
 
-//insertar usuario
-
-// Función para insertar usuarios
 // Función para insertar usuarios
 export async function insertarUsuarios(req, res) {
   try {

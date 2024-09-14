@@ -27,7 +27,8 @@ export async function insertarCategoriaProductos(req, res) {
     const sp_InsertarCategoriaProductos = "sp_InsertarCategoriaProductos"; // Nombre del procedimiento almacenado
 
     //informacion que el cliente nos envia desde el frontend
-    const { idUsuarios, nombre, idEstados } = req.body;
+    const {  nombre, idEstados } = req.body;
+    const {idUsuarios}= req.user;
 
     //esto nos facilita la interaccion con la base de datos
     const parametros = {

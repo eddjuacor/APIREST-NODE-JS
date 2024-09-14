@@ -5,13 +5,13 @@ import sequelize from "../config/db.js";
 export const listarEstados = async (req, res) => {
   try {
       const estados = await sequelize.query(
-          `SELECT * FROM Estados`, // Consulta SQL directa
+          `SELECT * FROM Estados`,
           {
-              type: sequelize.QueryTypes.SELECT // Especifica el tipo de consulta
+              type: sequelize.QueryTypes.SELECT 
           }
       );
 
-      res.status(200).json(estados); // Devuelve las categorías en formato JSON
+      res.status(200).json(estados); // me devuelve la categoria en json
   } catch (error) {
       res.status(500).json({ message: 'Error al obtener los estados', error: error.message });
   }
